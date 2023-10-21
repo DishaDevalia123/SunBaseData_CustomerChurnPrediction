@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customer Churn Prediction</title>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo">
+      <img src="{{ url_for('static', filename='company_logo.png') }}" alt="Company Logo">
+    </div>
+    <h2>Customer Churn Prediction</h2>
+    <form>
+      <div class="form-group">
+        <label for="location">Location</label>
+        <select id="location" name="location">
+          <option value="Miami">Miami</option>
+          <option value="New York">New York</option>
+          <option value="Los Angeles">Los Angeles</option>
+          <option value="Chicago">Chicago</option>
+          <option value="Houston">Houston</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" name="age" value="30">
+      </div>
+      <div class="form-group">
+        <label for="sub-length">Subscription Length (Months)</label>
+        <input type="number" id="sub-length" name="sub-length" value="12">
+      </div>
+      <div class="form-group">
+        <label for="monthly-bill">Monthly Bill ($)</label>
+        <input type="number" id="monthly-bill" name="monthly-bill" value="100">
+      </div>
+      <div class="form-group">
+        <label for="total-usage">Total Usage (GB)</label>
+        <input type="number" id="total-usage" name="total-usage" value="50">
+      </div>
+      <button type="button" onclick="predictChurn()">Predict Churn</button>
+    </form>
+    <div class="form-group">
+      <label for="predicted-result">Predicted Result</label>
+      <input type="text" id="predicted-result" placeholder="Predicted result" readonly>
+    </div>
+  </div>
+
+  <style>
+    body {
+      background: #f6f4ed;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .logo img {
+      display: block;
+      margin: 0 auto;
+      max-width: 150px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      color: #ff982d;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    input, select {
+      width: 90%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+        display: block;
+        margin: 0 auto;
+
+    }
+
+    button {
+      background: #ff982d;
+      color: #fff;
+      padding: 16px;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #ff7f0b;
+    }
+
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255,152,45,0.5);
+    }
+
+  </style>
+<script>
+  function predictChurn() {
+    var location = document.getElementById("location").value;
+    var age = parseInt(document.getElementById("age").value);
+    var subscriptionLength = parseInt(document.getElementById("sub-length").value);  // Update input ID
+    var monthlyBill = parseFloat(document.getElementById("monthly-bill").value);  // Update input ID
+    var totalUsage = parseFloat(document.getElementById("total-usage").value);  // Update input ID
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/Predict", true);  // Update the endpoint to '/predict'
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.prediction) {
+                displayPredictionResult(response.prediction);
+            } else if (response.error) {
+                displayPredictionResult("Error: " + response.error);
+            } else {
+                displayPredictionResult("Unexpected error.");
+            }
+        } else {
+            displayPredictionResult("Prediction failed. Please try again.");
+        }
+    };
+
+
+    var data = JSON.stringify({
+      location: location,
+      age: age,
+      subscriptionLength: subscriptionLength,
+      monthlyBill: monthlyBill,
+      totalUsage: totalUsage,
+    });
+
+    xhr.send(data);
+  }
+
+  function displayPredictionResult(result) {
+    var resultField = document.getElementById("predicted-result");
+    resultField.value = result;
+  }
+</script>
+
+</body>
+</html>
